@@ -58,8 +58,8 @@ jobs:
         run: |
           # 找出這一次 PR 新增或修改的程式碼檔案
           # 使用 git diff 找出 submissions/ 下的變更
-          git fetch origin main
-          CHANGED_FILES=$(git diff --name-only origin/main HEAD | grep '^submissions/' | grep -E '\.(py|js|go|rb|sh)$' || true)
+          git fetch origin master
+          CHANGED_FILES=$(git diff --name-only origin/master HEAD | grep '^submissions/' | grep -E '\.(py|js|go|rb|sh)$' || true)
           
           if [ -z "$CHANGED_FILES" ]; then
             echo "No submission files detected."
