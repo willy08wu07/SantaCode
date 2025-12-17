@@ -10,7 +10,7 @@ def validate_tree(output_text):
     if not output_text or not output_text.strip():
         return False, "Output is empty!"
         
-    tree_symbols = ['*', '^', '#', '@', '+', 'o', 'A']
+    tree_symbols = ['*', '^', '#', '@', '+', 'o', 'A', '🎄', '🌲', '🌳', '🎁', '✨']
     lines = output_text.strip().split('\n')
     
     # 檢查行數，樹通常不會只有一行

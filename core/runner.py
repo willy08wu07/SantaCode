@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 import logging
+import shlex
 from pathlib import Path
 
 # 設定 Log
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 LANGUAGE_CONFIG = {
     '.py': {
         'image': 'python:3.10-slim',
-        'command': 'python',
+        'command': 'python -B',
         'file_flag': '' 
     },
     '.js': {
@@ -22,7 +23,7 @@ LANGUAGE_CONFIG = {
     },
     '.go': {
         'image': 'golang:1.20-alpine',
-        'command': 'go run',
+        'command': 'sh -c "export GOCACHE=/tmp && go run $0"',
         'file_flag': ''
     },
     '.rb': {
@@ -37,17 +38,17 @@ LANGUAGE_CONFIG = {
     },
     '.java': {
         'image': 'openjdk:17-jdk-slim',
-        'command': 'java', 
+        'command': 'sh -c "java -Djava.io.tmpdir=/tmp $0"', 
         'file_flag': ''
     },
     '.kt': {
         'image': 'zenika/kotlin:1.8',
-        'command': 'kotlinc -script',
+        'command': 'sh -c "kotlinc $0 -include-runtime -d /tmp/output.jar && java -jar /tmp/output.jar"',
         'file_flag': ''
     },
     '.swift': {
         'image': 'swift:5.8-slim',
-        'command': 'swift',
+        'command': 'sh -c "swiftc $0 -o /tmp/app && /tmp/app"',
         'file_flag': ''
     },
     '.c': {
@@ -73,7 +74,7 @@ LANGUAGE_CONFIG = {
 }
 
 # 安全限制
-TIMEOUT_SEC = 10  # Increased for compiled languages
+TIMEOUT_SEC = 15  # Increased for compiled languages
 MEMORY_LIMIT = "512m"
 CPU_LIMIT = "0.5"
 
@@ -98,13 +99,13 @@ def run_in_docker(file_path: str):
     
     # 組合 Docker 指令
     # 對於需要 Shell 解析的指令 (如 C/C++/C#)，我們需要微調呼叫方式
-    cmd_list = config['command'].split()
+    cmd_list = shlex.split(config['command'])
     
     # 如果 command 包含 sh -c，我們需要正確處理參數
     if cmd_list[0] == 'sh' and '-c' in cmd_list:
-        # 將 filename 替換進去指令字串中 (簡單替換 $0)
-        # 注意：這是一個簡單的實作，實際專案可能需要更嚴謹的參數傳遞
-        script = cmd_list[2].replace('$0', filename)
+        # 將 filename 替換進去指令字串中，並使用 shlex.quote 確保檔名包含空白也能運作
+        quoted_filename = shlex.quote(filename)
+        script = cmd_list[2].replace('$0', quoted_filename)
         final_cmd = ['sh', '-c', script]
     else:
         final_cmd = [*cmd_list, filename]
@@ -115,6 +116,7 @@ def run_in_docker(file_path: str):
         "--memory", MEMORY_LIMIT,
         "--cpus", CPU_LIMIT,
         "--read-only",
+        "--env", "HOME=/tmp",          # Redirect HOME to writable tmpfs for all languages
         "--tmpfs", "/tmp:exec",        # 允許 /tmp 寫入且可執行 (編譯產物需要)
         "-v", f"{host_dir}:/app:ro",
         "-w", "/app",
@@ -149,13 +151,15 @@ if __name__ == "__main__":
     target_file = sys.argv[1]
     success, output = run_in_docker(target_file)
     
-    print("--- EXECUTION RESULT ---")
     if success:
-        print("STATUS: SUCCESS")
-        print("OUTPUT:")
+        # 將診斷資訊印到 stderr，確保 stdout 只有純粹的程式輸出
+        print("--- EXECUTION RESULT ---", file=sys.stderr)
+        print("STATUS: SUCCESS", file=sys.stderr)
+        # 只有這裡印到 stdout
         print(output)
     else:
-        print("STATUS: FAILED")
-        print("ERROR:")
-        print(output)
+        print("--- EXECUTION RESULT ---", file=sys.stderr)
+        print("STATUS: FAILED", file=sys.stderr)
+        print("ERROR:", file=sys.stderr)
+        print(output, file=sys.stderr)
         sys.exit(1)
