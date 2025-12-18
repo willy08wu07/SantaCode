@@ -1,0 +1,119 @@
+name: Test Multi-language Issue
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Test Announcement Issue (Multi-language)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const participantCount = 5; // Test data
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const year = new Date().getFullYear();
+            const exchangeDate = new Date().toISOString().split('T')[0];
+            const bold = '**';
+            const codeBlock = '```';
+
+            // Build multi-language issue body with collapsible sections
+            const issueBody = [
+              '# [TEST] 🎄 SantaCode Exchange Completed! | 交換完成！ | 交換完了！🎁',
+              '',
+              '> 🌍 Choose your language below | 在下方選擇你的語言 | 以下から言語を選択してください',
+              '',
+              '> ⚠️ This is a TEST issue. Real announcements will not have [TEST] prefix.',
+              '',
+              '---',
+              '',
+              '<details open>',
+              '<summary><h2>🇬🇧 English Version (Test)</h2></summary>',
+              '',
+              '## Test Exchange Results',
+              '',
+              `This is a ${bold}test${bold} of the multi-language announcement system.`,
+              '',
+              '### 📊 Test Statistics',
+              `- ${bold}Participants${bold}: ${participantCount} (test data)`,
+              `- ${bold}Exchange Date${bold}: ${exchangeDate}`,
+              `- ${bold}Status${bold}: ✅ Testing`,
+              '',
+              '### ✅ What Was Tested',
+              '',
+              '- Collapsible sections work correctly',
+              '- Multiple languages in one issue',
+              '- Only ONE notification sent to watchers',
+              '- Markdown formatting renders properly',
+              '',
+              `🌟 ${bold}Test completed successfully!${bold} 🌟`,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              '<details>',
+              '<summary><h2>🇹🇼 繁體中文版本（測試）</h2></summary>',
+              '',
+              '## 測試交換結果',
+              '',
+              `這是多語言公告系統的${bold}測試${bold}。`,
+              '',
+              '### 📊 測試統計',
+              `- ${bold}參與人數${bold}: ${participantCount}（測試資料）`,
+              `- ${bold}交換日期${bold}: ${exchangeDate}`,
+              `- ${bold}狀態${bold}: ✅ 測試中`,
+              '',
+              '### ✅ 測試項目',
+              '',
+              '- 折疊區塊正常運作',
+              '- 單一 Issue 包含多種語言',
+              '- 只發送一個通知給訂閱者',
+              '- Markdown 格式正確呈現',
+              '',
+              `🌟 ${bold}測試成功完成！${bold} 🌟`,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              '<details>',
+              '<summary><h2>🇯🇵 日本語版（テスト）</h2></summary>',
+              '',
+              '## テスト交換結果',
+              '',
+              `これは多言語アナウンスシステムの${bold}テスト${bold}です。`,
+              '',
+              '### 📊 テスト統計',
+              `- ${bold}参加者数${bold}: ${participantCount}（テストデータ）`,
+              `- ${bold}交換日${bold}: ${exchangeDate}`,
+              `- ${bold}ステータス${bold}: ✅ テスト中`,
+              '',
+              '### ✅ テスト項目',
+              '',
+              '- 折りたたみセクションが正常に機能',
+              '- 単一 Issue に複数言語を含む',
+              '- ウォッチャーに通知は1つのみ送信',
+              '- Markdown フォーマットが正しくレンダリング',
+              '',
+              `🌟 ${bold}テストが正常に完了しました！${bold} 🌟`,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              `${bold}Test by GitHub Actions${bold} - [View Workflow Run](${runUrl})`
+            ].join('\n');
+
+            // Create single multi-language test issue
+            console.log('Creating multi-language test issue...');
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[TEST] 🎄 SantaCode Exchange Completed! | 交換完成！ | 交換完了！🎁',
+              body: issueBody,
+              labels: ['test', 'multi-language']
+            });
+
+            console.log(`✅ Multi-language test issue created: Issue #${issue.data.number}`);

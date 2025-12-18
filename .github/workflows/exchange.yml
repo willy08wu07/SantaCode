@@ -48,3 +48,185 @@ jobs:
         with:
           name: secret-santa-matches-report
           path: match_report.csv
+
+      - name: Create Announcement Issue (Multi-language)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read participants from match report
+            const reportPath = 'match_report.csv';
+            let participantCount = 0;
+
+            try {
+              const report = fs.readFileSync(reportPath, 'utf8');
+              participantCount = report.split('\n').length - 2; // Exclude header and empty line
+            } catch (error) {
+              participantCount = 'N/A';
+            }
+
+            // Get workflow run URL
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const year = new Date().getFullYear();
+            const exchangeDate = new Date().toISOString().split('T')[0];
+            const bold = '**';
+            const codeBlock = '```';
+
+            // Build multi-language issue body with collapsible sections
+            const issueBody = [
+              '# 🎄 SantaCode Exchange Completed! | 交換完成！ | 交換完了！🎁',
+              '',
+              '> 🌍 Choose your language below | 在下方選擇你的語言 | 以下から言語を選択してください',
+              '',
+              '---',
+              '',
+              '<details open>',
+              '<summary><h2>🇬🇧 English Version</h2></summary>',
+              '',
+              '## Exchange Results',
+              '',
+              `The ${bold}${year} SantaCode Gift Exchange${bold} has been successfully completed!`,
+              '',
+              '### 📊 Statistics',
+              `- ${bold}Participants${bold}: ${participantCount}`,
+              `- ${bold}Exchange Date${bold}: ${exchangeDate}`,
+              `- ${bold}Status${bold}: ✅ Completed`,
+              '',
+              '### 🎁 How to Find Your Match',
+              '',
+              'Your secret santa match has been delivered to your submission folder:',
+              '',
+              `${codeBlock}bash`,
+              '# Check your folder',
+              'ls -la submissions/<your-github-username>/',
+              '',
+              '# You should see a new file from your secret santa!',
+              codeBlock,
+              '',
+              '### 📥 Download Full Report',
+              '',
+              'The complete matching report is available as an artifact in the workflow run:',
+              `- [Download Match Report](${runUrl})`,
+              '',
+              "### 🎅 What's Next?",
+              '',
+              `1. ${bold}Check your folder${bold} for the gift you received`,
+              `2. ${bold}Run the code${bold} to see what your secret santa created for you`,
+              `3. ${bold}Share your experience${bold} in the Discussions tab`,
+              `4. ${bold}Star the repo${bold} if you enjoyed participating!`,
+              '',
+              '### 📢 How This Notification Works',
+              '',
+              'This issue was automatically created by GitHub Actions. All participants who are watching this repository will receive a notification. No spam, no manual @mentions!',
+              '',
+              `🌟 ${bold}Thank you for participating in SantaCode ${year}!${bold} 🌟`,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              '<details>',
+              '<summary><h2>🇹🇼 繁體中文版本</h2></summary>',
+              '',
+              '## 交換結果',
+              '',
+              `${bold}${year} SantaCode 禮物交換${bold}已成功完成！`,
+              '',
+              '### 📊 統計資料',
+              `- ${bold}參與人數${bold}: ${participantCount}`,
+              `- ${bold}交換日期${bold}: ${exchangeDate}`,
+              `- ${bold}狀態${bold}: ✅ 已完成`,
+              '',
+              '### 🎁 如何找到你的配對',
+              '',
+              '你的神秘聖誕老人配對已送達你的提交資料夾：',
+              '',
+              `${codeBlock}bash`,
+              '# 檢查你的資料夾',
+              'ls -la submissions/<你的-github-用戶名>/',
+              '',
+              '# 你應該會看到來自神秘聖誕老人的新檔案！',
+              codeBlock,
+              '',
+              '### 📥 下載完整報告',
+              '',
+              '完整的配對報告可在工作流程執行中作為 artifact 下載：',
+              `- [下載配對報告](${runUrl})`,
+              '',
+              '### 🎅 接下來做什麼？',
+              '',
+              `1. ${bold}檢查你的資料夾${bold}，查看收到的禮物`,
+              `2. ${bold}執行程式碼${bold}，看看你的神秘聖誕老人創作了什麼`,
+              `3. ${bold}分享你的體驗${bold}，在 Discussions 分頁中`,
+              `4. ${bold}給專案按星星${bold}，如果你喜歡這次活動！`,
+              '',
+              '### 📢 通知機制說明',
+              '',
+              '此 Issue 由 GitHub Actions 自動建立。所有 Watch 此 repository 的參與者都會收到通知。無垃圾訊息，無手動 @mentions！',
+              '',
+              `🌟 ${bold}感謝參與 SantaCode ${year}！${bold} 🌟`,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              '<details>',
+              '<summary><h2>🇯🇵 日本語版</h2></summary>',
+              '',
+              '## 交換結果',
+              '',
+              `${bold}${year} SantaCode プレゼント交換${bold}が正常に完了しました！`,
+              '',
+              '### 📊 統計',
+              `- ${bold}参加者数${bold}: ${participantCount}`,
+              `- ${bold}交換日${bold}: ${exchangeDate}`,
+              `- ${bold}ステータス${bold}: ✅ 完了`,
+              '',
+              '### 🎁 マッチングの確認方法',
+              '',
+              'あなたのシークレットサンタのマッチングがあなたの提出フォルダに配信されました：',
+              '',
+              `${codeBlock}bash`,
+              '# フォルダをチェック',
+              'ls -la submissions/<your-github-username>/',
+              '',
+              '# 謎のサンタからの新しいファイルが表示されます！',
+              codeBlock,
+              '',
+              '### 📥 完全なレポートのダウンロード',
+              '',
+              '完全なマッチングレポートは、ワークフロー実行の成果物として利用できます：',
+              `- [マッチングレポートをダウンロード](${runUrl})`,
+              '',
+              '### 🎅 次のステップ',
+              '',
+              `1. ${bold}フォルダをチェック${bold}して、受け取ったプレゼントを確認`,
+              `2. ${bold}コードを実行${bold}して、シークレットサンタが作成したものを見る`,
+              `3. ${bold}体験を共有${bold}、Discussions タブで`,
+              `4. ${bold}リポジトリにスター${bold}を付けて、参加を楽しんだ場合！`,
+              '',
+              '### 📢 通知の仕組み',
+              '',
+              'この Issue は GitHub Actions によって自動的に作成されました。このリポジトリを Watch しているすべての参加者に通知が届きます。スパムなし、手動 @mentions なし！',
+              '',
+              `🌟 ${bold}SantaCode ${year} にご参加いただきありがとうございます！${bold} 🌟`,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              `${bold}Automated by GitHub Actions${bold} - [View Workflow Run](${runUrl})`
+            ].join('\n');
+
+            // Create single multi-language issue
+            console.log('Creating multi-language announcement issue...');
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🎄 SantaCode Exchange Completed! | 交換完成！ | 交換完了！🎁',
+              body: issueBody,
+              labels: ['announcement', 'exchange-completed']
+            });
+
+            console.log(`✅ Multi-language announcement created: Issue #${issue.data.number}`);

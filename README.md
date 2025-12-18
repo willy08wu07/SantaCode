@@ -35,6 +35,10 @@ Welcome to the Programmer's Secret Santa!
 3.  **Write Code**: 放入你的程式碼 (e.g., `tree.py`)。
     *你可以參考 [submissions/example-santa/](submissions/example-santa/) 裡面的多語言範例檔案。*
 4.  **Pull Request**: 發送 Pull Request。等待綠色勾勾 ✅。
+5.  **📬 Watch Repository (重要！)**:
+    - 點擊專案右上角的 **Watch** 按鈕
+    - 選擇 **Custom** > 勾選 **Issues** ✅
+    - ⚠️ **如果不 Watch，你將收不到交換完成的通知！**
 
 ## 🧪 本地測試 (Local Test)
 
@@ -47,4 +51,14 @@ docker run --rm --network none --memory 512m -v $(pwd)/submissions/YOUR_ID:/app 
 
 ## 🎁 交換 (Exchange)
 
-活動截止後，Repo 管理員會按下「交換按鈕」。系統會自動亂數配對，並在 Issues 中標記你，讓你收到別人的程式碼執行結果！
+活動截止後，Repo 管理員會按下「交換按鈕」。系統會自動亂數配對，並**自動創建 Issue 公告**！
+
+### 📬 如何接收通知？
+
+為了避免大量 @mention 造成困擾，我們使用 Issue 公告機制。請在參加後執行以下步驟：
+
+1. 點擊本專案右上角的 **Watch** 按鈕
+2. 選擇 **Custom** > 勾選 **Issues** ✅
+3. 當交換完成時，你會自動收到通知！
+
+這樣你就不會錯過任何更新，也不會被過多的通知打擾。
